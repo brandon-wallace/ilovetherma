@@ -1,0 +1,18 @@
+{# application/templates/forum/index.html #}
+
+{% extends "layout.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block body %}
+
+  <h1>I Love Therma</h1>
+
+  <p>datetime: {{ date_time if date_time }}</p>
+  <p>method: {{ method if method }}</p>
+  <p>ip address: {{ ip_address if ip_address }}</p>
+  <p>user agent: {{ user_agent if user_agent }}</p>
+  <p>host: {{ host if host }}</p>
+  <p>referer: {{ referer if referer }}</p>
+
+{% endblock %}
