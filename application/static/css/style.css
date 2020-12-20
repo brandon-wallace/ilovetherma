@@ -6,14 +6,20 @@ body {
 
 body {
     display: flex;
+    color: #FFFFFF;
     min-height: 100vh;
+    font-weight: bold;
     flex-direction: column;
+    background-color: #111111;
     font-family: monospace, monospace;
+}
+
+h1 {
+    margin: 0;
 }
 
 footer {
     width: 100%;
-    height: 25px;
     padding: 0 .5rem;
     margin-top: auto;
     box-sizing: border-box;

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 from flask import (Blueprint, render_template, url_for, redirect, request)
 
@@ -8,7 +8,7 @@ main = Blueprint('main', __name__)
 def get_user_location():
     '''Get the user's current location'''
 
-    method = None
+    method = ''
 
     if 'X-Forwarded-For' in request.headers:
         ip_address = request.headers['X-Forwarded-For']
@@ -48,8 +48,8 @@ def index():
     location = get_user_location()
     method = location[0]
     ip_address = location[1]
-    now = datetime.utcnow()
-
+    now = datetime.now(tz=timezone.utc).strftime(
+                          '%Y-%m-%d %H:%M:%S:%f %Z%z')
     content = {
             'location': location,
             'method': method,

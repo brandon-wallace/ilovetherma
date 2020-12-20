@@ -10,7 +10,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Your Weather</title>
+    <title>ILoveTherma</title>
 
   </head>
 
@@ -20,10 +20,24 @@
       <p style="color:#FC0000;text-align:center">Please enable Javascript</p>
     </noscript>
 
+    <header>
+
+      <h1>I Love Therma</h1>
+
+    </header>
+
     {% block body %}
 
     {% endblock %}
 
+    <footer>
+
+      <p>&copy; 2021</p>
+
+    </footer>
+
   </body>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </html>

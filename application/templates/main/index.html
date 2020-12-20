@@ -6,13 +6,15 @@
 
 {% block body %}
 
-  <h1>I Love Therma</h1>
+  <main>
 
-  <p>datetime: {{ date_time if date_time }}</p>
+  <p>datetime: {{ now if now }}</p>
   <p>method: {{ method if method }}</p>
   <p>ip address: {{ ip_address if ip_address }}</p>
   <p>user agent: {{ user_agent if user_agent }}</p>
   <p>host: {{ host if host }}</p>
   <p>referer: {{ referer if referer }}</p>
+
+  </main>
 
 {% endblock %}
