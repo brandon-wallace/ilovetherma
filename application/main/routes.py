@@ -1,6 +1,8 @@
+import json
+from os import environ
 from datetime import datetime, timezone
 import requests
-from flask import (Blueprint, render_template, url_for, redirect, request)
+from flask import Blueprint, render_template, request
 
 main = Blueprint('main', __name__)
 
@@ -8,13 +10,12 @@ main = Blueprint('main', __name__)
 def get_user_location():
     '''Get the user's current location'''
 
-    method = ''
-
     if 'X-Forwarded-For' in request.headers:
-        ip_address = request.headers['X-Forwarded-For']
+        ip_address = str(request.headers['X-Forwarded-For'])
         method = 'x-forwarded'
     else:
-        ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        ip_address = str(request.environ.get('HTTP_X_REAL_IP',
+                         request.remote_addr))
         method = 'http-x-real-ip'
 
     if ip_address == '127.0.0.1':
@@ -37,6 +38,21 @@ def get_user_location():
     return method, ip_address
 
 
+def get_geographic_location(ip_addr):
+    '''Get latitude and longitude'''
+
+    api_key = environ.get('IPGEO_API_KEY')
+
+    url = requests.get(f'https://api.ipgeolocation.io/ipgeo?apiKey={api_key}&ip={ip_addr}&fields=geo')
+
+    if url.status_code == 200:
+        data = url.text
+        info = json.loads(data)
+        json.dumps(info, ensure_ascii=False)
+        return info
+    return None
+
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     '''Index route'''
@@ -45,19 +61,23 @@ def index():
     host = request.headers.get('Host')
     referer = request.headers.get('Referer')
 
-    location = get_user_location()
-    method = location[0]
-    ip_address = location[1]
+    ipaddress = get_user_location()
+    method = ipaddress[0]
+    ip_address = ipaddress[1]
+    data = get_geographic_location(ip_address)
+    lat = data['latitude']
+    lon = data['longitude']
     now = datetime.now(tz=timezone.utc).strftime(
                           '%Y-%m-%d %H:%M:%S:%f %Z%z')
     content = {
-            'location': location,
-            'method': method,
-            'ip_address': ip_address,
-            'now': now,
             'user_agent': user_agent,
             'host': host,
-            'referer': referer
+            'referer': referer,
+            'method': method,
+            'ip_address': ip_address,
+            'lat': lat,
+            'lon': lon,
+            'now': now
             }
     return render_template('main/index.html', **content)
 
