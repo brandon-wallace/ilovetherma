@@ -1,8 +1,17 @@
+import logging
 import json
 from os import environ
 from datetime import datetime, timezone
 import requests
 from flask import Blueprint, render_template, request
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler('error.log')
+formatter = logging.Formatter('%(asctime)s: %(levelname)s: \
+                              %(name)s: %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 main = Blueprint('main', __name__)
 
@@ -14,11 +23,13 @@ def get_user_ip_address():
         ip_address = str(request.headers['X-Forwarded-For'])
         method = 'x-forwarded'
     else:
+        logger.info(f'Using X-Forward-For failed attempting HTTP_X_REAL_IP...')
         ip_address = str(request.environ.get('HTTP_X_REAL_IP',
                          request.remote_addr))
         method = 'http-x-real-ip'
 
     if ip_address == '127.0.0.1':
+        logger.info(f'Using IP address 127.0.0.1')
         ip_address = requests.get('http://ipecho.net/plain').text
         method = '127.0.0.1 used'
 
@@ -38,6 +49,7 @@ def get_geo_location(ip_addr):
         info = json.loads(data)
         json.dumps(info, ensure_ascii=False)
         return info
+    logger.error(f'IPGEO Error!!!! {url.status_code}')
     return None
 
 
@@ -56,6 +68,7 @@ def index():
     lat = data['latitude']
     lon = data['longitude']
     country_code2 = data['country_code2']
+    country_code3 = data['country_code3']
     country_name = data['country_name']
     state_prov = data['state_prov']
     district = data['district']
@@ -72,6 +85,7 @@ def index():
             'lat': lat,
             'lon': lon,
             'country_code2': country_code2,
+            'country_code3': country_code3,
             'country_name': country_name,
             'state_prov': state_prov,
             'district': district,
@@ -93,4 +107,5 @@ def page_not_found(error):
 def internal_server_error(error):
     '''Internal server error'''
 
+    logger.error(f"A 500 internal server error has occurred.")
     return render_template('500.html'), 500
